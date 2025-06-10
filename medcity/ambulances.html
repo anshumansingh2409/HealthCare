@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🚑 Emergency SOS System</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ff5252, #ffe6e6);
+      margin: 0;
+      padding: 0;
+      color: #222;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 30px;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    .main-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .sos-button {
+      background: #d50000;
+      color: white;
+      font-size: 26px;
+      font-weight: bold;
+      padding: 25px 60px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      animation: pulse 1.2s infinite;
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .status-box, .penalty-box {
+      display: none;
+      margin: 30px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      max-width: 500px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+      text-align: left;
+      animation: slideIn 1s ease forwards;
+    }
+
+    .status-box {
+      border-left: 6px solid #388e3c;
+    }
+
+    .penalty-box {
+      background: #fff3cd;
+      border-left: 6px solid #ff6f00;
+      color: #7b5000;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .countdown {
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .info-sec {
+      margin-top: 15px;
+      font-size: 16px;
+      color: #333;
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .btn-call {
+      margin-top: 12px;
+      display: inline-block;
+      background: #0277bd;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    audio { display: none; }
+  </style>
+</head>
+<body>
+
+<h1>🚨 Emergency SOS Response System</h1>
+
+<div class="main-container">
+  <button class="sos-button" onclick="triggerEmergency()">🚨 I Need Immediate Help</button>
+</div>
+
+<div class="status-box" id="statusBox">
+  <h3>📍 Emergency Response Details</h3>
+  <p><strong>Nearest Hospital:</strong> AIIMS Rural Health Center</p>
+  <p><strong>Location:</strong> NH-44, Near Bus Stand, Kharar, Punjab</p>
+  <p><strong>Ambulance ETA:</strong> <span id="eta">--</span> minutes</p>
+  <div class="countdown">⏳ Time Remaining: <span id="countdownTimer">--</span></div>
+  <p><strong>Track Ambulance:</strong> <a href="#" id="mapLink" target="_blank">Google Maps</a></p>
+
+  <div class="info-sec">
+    📍 <strong>Your Location:</strong>
+    <div><span id="latitude"></span>, <span id="longitude"></span></div>
+  </div>
+
+  <a href="tel:102" class="btn-call">📞 Call Ambulance</a>
+</div>
+
+<div class="penalty-box" id="penaltyBox">
+  <h3>⚠ Penalty Imposed</h3>
+  <p>The ambulance took longer than expected. A penalty of <strong>₹5000</strong> is imposed on the hospital.</p>
+  <p><strong>Actual Response Time:</strong> <span id="penaltyTime"></span> mins</p>
+</div>
+
+<audio id="sirenSound" src="https://actions.google.com/sounds/v1/emergency/emergency_siren_short.ogg"></audio>
+
+<script>
+  let userLat = null;
+  let userLng = null;
+  let countdownInterval;
+
+  window.onload = function () {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          console.log("✅ Location access granted.");
+        },
+        (err) => {
+          console.warn("❌ Location access denied.");
+          alert("⚠ Please allow location access to use SOS features.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported in this browser.");
+    }
+  };
+
+  function triggerEmergency() {
+    const siren = document.getElementById("sirenSound");
+    siren.play();
+
+    if ("vibrate" in navigator) {
+      navigator.vibrate([500, 300, 500]);
+    }
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          userLat = position.coords.latitude.toFixed(5);
+          userLng = position.coords.longitude.toFixed(5);
+
+          document.getElementById("latitude").innerText = userLat;
+          document.getElementById("longitude").innerText = userLng;
+          document.getElementById("mapLink").href = `https://www.google.com/maps?q=${userLat},${userLng}`;
+
+          const eta = Math.floor(Math.random() * 21) + 10; // ETA between 10-30 minutes
+          document.getElementById("eta").innerText = eta;
+          document.getElementById("statusBox").style.display = "block";
+
+          startCountdown(eta);
+
+          if (eta > 20) {
+            document.getElementById("penaltyBox").style.display = "block";
+            document.getElementById("penaltyTime").innerText = eta;
+          }
+
+          setTimeout(() => {
+            document.getElementById("statusBox").scrollIntoView({ behavior: "smooth" });
+          }, 200);
+        },
+        (error) => {
+          alert("❌ Location access denied. Cannot proceed.");
+        }
+      );
+    } else {
+      alert("Geolocation not supported.");
+    }
+  }
+
+  function startCountdown(minutes) {
+    let seconds = minutes * 60;
+    const timer = document.getElementById("countdownTimer");
+
+    if (countdownInterval) clearInterval(countdownInterval);
+
+    countdownInterval = setInterval(() => {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      timer.textContent = `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+
+      if (seconds <= 0) {
+        clearInterval(countdownInterval);
+        timer.textContent = "Time's up!";
+      }
+
+      seconds--;
+    }, 1000);
+  }
+</script>
+
+</body>
+</html>

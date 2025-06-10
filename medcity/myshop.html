@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Online Medicine Shop</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef6f9;
+    }
+    header {
+      background: #003566;
+      color: #fff;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .marquee {
+      color: #ffc300;
+      font-weight: bold;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .container {
+      display: flex;
+    }
+    .product-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 10px;
+      flex: 3;
+    }
+    .product {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      height: 210px;
+    }
+    .product h3, .product p {
+      font-size: 16px;
+      margin: 6px 0;
+    }
+    .product button {
+      margin-top: 10px;
+      background: #0077b6;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .sidebar {
+      flex: 1;
+      padding: 10px;
+      background: #e0f2f1;
+    }
+    .cart-item, .payment-section, .status-section {
+      background: white;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    .print-btn, .buy-btn {
+      background: #0077b6;
+      color: white;
+      padding: 6px 10px;
+      margin-right: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .payment-section input, .payment-section select {
+      width: 100%;
+      margin-top: 8px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .qr-code img {
+      width: 120px;
+      margin: 10px 0;
+    }
+    .search-bar {
+      margin: 10px;
+      text-align: right;
+    }
+    .search-bar input {
+      width: 220px;
+      padding: 6px;
+      font-size: 14px;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printArea, #printArea * {
+        visibility: visible;
+      }
+      #printArea {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 40px;
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💊 Online Medicine Shop</h1>
+  <div class="marquee">Best Prices | 100+ Medicines | Fast Delivery | GST 18% Deducted</div>
+</header>
+
+<div class="search-bar">
+  <input type="text" id="searchInput" onkeyup="filterMedicines()" placeholder="🔍 Search medicine by name...">
+</div>
+
+<div class="container">
+  <div class="product-list" id="productList"></div>
+
+  <div class="sidebar">
+    <h3>🛒 Cart</h3>
+    <div id="cartItems"></div>
+    <div id="billingSummary"></div>
+    <button class="print-btn" onclick="printBill()">🖨 Print Bill</button>
+    <button class="buy-btn" onclick="showPayment()">💳 Buy Now</button>
+
+    <div class="payment-section" id="paymentSection" style="display:none;">
+      <h4>Select Payment Method</h4>
+      <select id="paymentMethod" onchange="showPaymentFields()">
+        <option value="">--Select--</option>
+        <option value="upi">UPI</option>
+        <option value="card">Debit/Credit Card</option>
+        <option value="cod">Cash on Delivery</option>
+      </select>
+      <div id="paymentFields"></div>
+    </div>
+
+    <div class="status-section" id="statusSection" style="display:none;">
+      <h4>📦 Order Status</h4>
+      <p id="step1">✅ Order Confirmed</p>
+      <p id="step2">📦 Packing...</p>
+      <p id="step3">🚚 Out for Delivery</p>
+      <p id="step4">🏠 Arrived at your place</p>
+      <p id="step5">✔ Delivered</p>
+      <hr>
+      <p><strong>Delivery Partner:</strong> Rahul Singh</p>
+      <p><strong>Contact:</strong> ‪+91 9876543210‬</p>
+    </div>
+  </div>
+</div>
+
+<!-- Print Area -->
+<div id="printArea" style="display:none;">
+  <h2>🧾 Medicine Purchase Bill</h2>
+  <div id="printItems"></div>
+  <div id="printSummary"></div>
+</div>
+
+<script>
+  const categories = ["Fever", "Cold", "Pain Relief", "Allergy", "Diabetes", "BP", "Heart", "Liver", "Vitamins", "Skin"];
+  let medicines = [];
+  for (let i = 1; i <= 100; i++) {
+    medicines.push({
+      id: i,
+      name: `Medicine ${i}`,
+      category: categories[i % categories.length],
+      description: `Used for ${categories[i % categories.length]}`,
+      price: Math.floor(Math.random() * 100 + 20)
+    });
+  }
+  
+  let cart = [];
+  
+  function displayMedicines(filtered = medicines) {
+    const list = document.getElementById("productList");
+    list.innerHTML = '';
+    filtered.forEach(med => {
+      list.innerHTML += `
+        <div class="product">
+          <h3>${med.name}</h3>
+          <p>${med.description}</p>
+          <p>Price: ₹${med.price}</p>
+          <p>GST (18%): ₹${(med.price * 0.18).toFixed(2)}</p>
+          <button onclick="addToCart(${med.id})">Add to Cart</button>
+        </div>`;
+    });
+  }
+  
+  function addToCart(id) {
+    const item = medicines.find(m => m.id === id);
+    const existing = cart.find(m => m.id === id);
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({ ...item, qty: 1 });
+    }
+    updateCart();
+  }
+  
+  function updateCart() {
+    const cartItems = document.getElementById("cartItems");
+    const billing = document.getElementById("billingSummary");
+    cartItems.innerHTML = '';
+    let total = 0;
+    cart.forEach(item => {
+      let subtotal = item.price * item.qty;
+      total += subtotal;
+      cartItems.innerHTML += `<div class="cart-item">
+        <strong>${item.name}</strong> x${item.qty}<br>Subtotal: ₹${subtotal}
+      </div>`;
+    });
+    let gst = total * 0.18;
+    let final = total - gst;
+    billing.innerHTML = `
+      <h4>Billing Summary</h4>
+      <p>Total: ₹${total.toFixed(2)}</p>
+      <p>GST (18%): ₹${gst.toFixed(2)}</p>
+      <p><strong>Payable: ₹${final.toFixed(2)}</strong></p>`;
+  }
+  
+  function showPayment() {
+    document.getElementById("paymentSection").style.display = "block";
+  }
+  
+  function showPaymentFields() {
+    const method = document.getElementById("paymentMethod").value;
+    const box = document.getElementById("paymentFields");
+    if (method === "upi") {
+      box.innerHTML = `
+        <p>Scan QR or enter UPI ID</p>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?data=upi://pay?pa=demo@upi&pn=Pharmacy" class="qr-code"/>
+        <input type="text" placeholder="Enter your UPI ID">
+        <button class="buy-btn" onclick="confirmOrder()">✔ Payment Done</button>`;
+    } else if (method === "card") {
+      box.innerHTML = `
+        <input type="text" placeholder="Card Number">
+        <input type="text" placeholder="Cardholder Name">
+        <input type="text" placeholder="MM/YY">
+        <input type="text" placeholder="CVV">
+        <button class="buy-btn" onclick="confirmOrder()">✔ Pay Now</button>`;
+    } else if (method === "cod") {
+      box.innerHTML = `<button class="buy-btn" onclick="confirmOrder()">✔ Confirm Order</button>`;
+    } else {
+      box.innerHTML = "";
+    }
+  }
+  
+  function confirmOrder() {
+    document.getElementById("statusSection").style.display = "block";
+    let steps = ["step2", "step3", "step4", "step5"];
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < steps.length) {
+        document.getElementById(steps[i]).style.color = "green";
+        i++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 1500);
+  }
+  
+  function printBill() {
+    const printItems = document.getElementById("printItems");
+    const printSummary = document.getElementById("printSummary");
+    const printArea = document.getElementById("printArea");
+    printItems.innerHTML = "";
+    let total = 0;
+    cart.forEach(item => {
+      let subtotal = item.price * item.qty;
+      total += subtotal;
+      printItems.innerHTML += `<p><strong>${item.name}</strong><br>
+        ${item.description}<br>
+        Quantity: ${item.qty}<br>
+        Subtotal: ₹${subtotal}</p><hr>`;
+    });
+    let gst = total * 0.18;
+    let final = total - gst;
+    printSummary.innerHTML = `
+      <p>Total: ₹${total.toFixed(2)}</p>
+      <p>GST (18%): ₹${gst.toFixed(2)}</p>
+      <p><strong>Payable: ₹${final.toFixed(2)}</strong></p>`;
+    printArea.style.display = "block";
+    window.print();
+    printArea.style.display = "none";
+  }
+  
+  function filterMedicines() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = medicines.filter(med => med.name.toLowerCase().includes(query));
+    displayMedicines(filtered);
+  }
+  
+  displayMedicines();
+  </script>
+  

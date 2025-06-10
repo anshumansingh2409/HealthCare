@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Healthcare Project - About Us</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <style>
+    /* Core Reset & Font */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    html, body { scroll-behavior: smooth; background: #e9f4fb; color: #222; }
+
+    /* Header */
+    header {
+      background: linear-gradient(to right, #00b4db, #0083b0);
+      padding: 40px 20px;
+      color: white;
+      text-align: center;
+      animation: slideIn 1.2s ease-in-out;
+    }
+
+    header h1 { font-size: 2.8em; }
+    header p { font-size: 1.2em; margin-top: 10px; }
+
+    nav {
+      background: #0077a6;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    nav a {
+      color: white;
+      padding: 15px 25px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    nav a:hover { background: #005d80; }
+
+    section {
+      padding: 50px 30px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    section h2 {
+      font-size: 2.2em;
+      color: #0083b0;
+      margin-bottom: 20px;
+      border-left: 5px solid #00b4db;
+      padding-left: 15px;
+      animation: fadeUp 1s ease;
+    }
+
+    .text-block, ul {
+      font-size: 1.1em;
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    ul li::marker {
+      color: #00a2c3;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card h3 { margin-bottom: 10px; color: #00688b; }
+
+    /* Popup */
+    .popup-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .popup {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 500px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      animation: zoomIn 0.4s ease;
+    }
+
+    .popup h3 {
+      color: #0083b0;
+      margin-bottom: 15px;
+    }
+
+    .close-btn {
+      background: #ff4f4f;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      float: right;
+    }
+
+    .contact-btn {
+      background: #00b894;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    footer {
+      background: #00688b;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    /* Animations */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      header h1 { font-size: 2em; }
+      section h2 { font-size: 1.6em; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>HealthConnect: Rural Telemedicine</h1>
+  <p>AI-driven healthcare for India’s heartland</p>
+</header>
+
+<nav>
+  <a href="#about">About</a>
+  <a href="#mission">Mission</a>
+  <a href="#features">Features</a>
+  <a href="#team">Team</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<section id="about">
+  <h2>About Us</h2>
+  <div class="text-block">
+    We are a tech-for-good startup bringing life-saving healthcare to rural India through AI, blockchain, and compassion. Our offline-ready app enables locals to self-diagnose, consult doctors virtually, and access reliable medicines.
+  </div>
+  <div class="text-block">
+    Our work began in a village with no doctor. Today, we serve 20+ remote communities with the help of local health workers and smart AI.
+  </div>
+</section>
+
+<section id="mission">
+  <h2>Our Mission</h2>
+  <ul>
+    <li>Make healthcare accessible to every Indian citizen.</li>
+    <li>Use AI to bridge the doctor-patient gap in remote areas.</li>
+    <li>Educate people on health and hygiene through smart tools.</li>
+    <li>Ensure privacy, affordability, and real-time care.</li>
+  </ul>
+</section>
+
+<section id="features">
+  <h2>Platform Features</h2>
+  <div class="grid">
+    <div class="card"><h3>AI Health Assistant</h3><p>Symptom-based diagnosis with voice & text input, even offline!</p></div>
+    <div class="card"><h3>Live Doctor Queue</h3><p>Urgent cases prioritized using severity-level detection.</p></div>
+    <div class="card"><h3>Blockchain Medical Records</h3><p>Ensures tamper-proof history of treatments and reports.</p></div>
+    <div class="card"><h3>Multilingual Support</h3><p>Supports 8+ Indian languages to reach diverse populations.</p></div>
+    <div class="card"><h3>Medicine Verification</h3><p>Scan meds for expiry or fake tags using phone camera.</p></div>
+    <div class="card"><h3>Micro Payments</h3><p>Just ₹10 for diagnosis. Secure UPI/Card integration.</p></div>
+  </div>
+</section>
+
+<section id="team">
+  <h2>Our Team</h2>
+  <div class="grid">
+    <div class="card" onclick="openPopup('Anshuman', 'Full-Stack Developer & Founder. Passionate about tech for Bharat.')">
+      <h3>Anshuman</h3><p>Tech Lead</p>
+    </div>
+    <div class="card" onclick="openPopup('Dr. Neha', 'Telemedicine Advisor. 10+ yrs in community health.')">
+      <h3>Dr. Neha</h3><p>Medical Advisor</p>
+    </div>
+    <div class="card" onclick="openPopup('Ravi Kumar', 'AI/ML Engineer. Built symptom-to-diagnosis model.')">
+      <h3>Ravi Kumar</h3><p>AI Engineer</p>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <h2>Get in Touch</h2>
+  <p>Want to collaborate, invest, or deploy in your village? We’d love to hear from you.</p>
+  <button class="contact-btn" onclick="openPopup('Contact Us', '📧 Email: hello@healthconnect.in<br>📞 Phone: +91-9876543210')">Contact Now</button>
+</section>
+
+<footer>
+  &copy; 2025 HealthConnect | Built with ❤️ by Anshuman & Team
+</footer>
+
+<!-- POPUP -->
+<div class="popup-bg" id="popup">
+  <div class="popup">
+    <button class="close-btn" onclick="closePopup()">Close</button>
+    <h3 id="popup-title">Popup Title</h3>
+    <p id="popup-content">Popup content goes here...</p>
+  </div>
+</div>
+
+<script>
+  function openPopup(title, content) {
+    document.getElementById('popup-title').innerText = title;
+    document.getElementById('popup-content').innerHTML = content;
+    document.getElementById('popup').style.display = 'flex';
+  }
+
+  function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+  }
+</script>
+
+</body>
+</html>

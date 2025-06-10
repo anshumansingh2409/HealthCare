@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Create Account - MedCity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #e8f5e9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 2.5rem 3rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 420px;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+
+    .form-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 1rem 0.75rem 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      background: transparent;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .form-group label {
+      position: absolute;
+      top: 50%;
+      left: 0.75rem;
+      transform: translateY(-50%);
+      background-color: white;
+      padding: 0 5px;
+      color: #999;
+      font-size: 0.95rem;
+      pointer-events: none;
+      transition: 0.2s ease all;
+    }
+
+    .form-group input:focus,
+    .form-group input:not(:placeholder-shown) {
+      border-color: #2e7d32;
+    }
+
+    .form-group input:focus + label,
+    .form-group input:not(:placeholder-shown) + label {
+      top: -10px;
+      font-size: 0.75rem;
+      color: #2e7d32;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.9rem;
+      background-color: #2e7d32;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1b5e20;
+    }
+
+    .message {
+      margin-top: 1.2rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Create Account</h2>
+    <form id="registerForm">
+      <div class="form-group">
+        <input type="text" name="name" placeholder=" " required />
+        <label>Full Name</label>
+      </div>
+      <div class="form-group">
+        <input type="text" name="emailOrPhone" placeholder=" " required />
+        <label>Email or Phone</label>
+      </div>
+      <div class="form-group">
+        <input type="password" name="password" placeholder=" " required />
+        <label>Password</label>
+      </div>
+      <div class="form-group">
+        <input type="password" name="confirm_password" placeholder=" " required />
+        <label>Confirm Password</label>
+      </div>
+      <button type="submit">Register</button>
+    </form>
+    <div class="message" id="messageBox"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const messageBox = document.getElementById('messageBox');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = form.name.value.trim();
+      const emailOrPhone = form.emailOrPhone.value.trim();
+      const password = form.password.value.trim();
+      const confirm_password = form.confirm_password.value.trim();
+
+      if (!name || !emailOrPhone || !password || !confirm_password) {
+        messageBox.textContent = "All fields are required.";
+        messageBox.className = "message error";
+        return;
+      }
+
+      if (password !== confirm_password) {
+        messageBox.textContent = "Passwords do not match.";
+        messageBox.className = "message error";
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, emailOrPhone, password, confirm_password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          messageBox.textContent = data.message || "Registration successful!";
+          messageBox.className = "message success";
+          form.reset();
+          window.location.href= "/medcity/index.html"
+        } else {
+          messageBox.textContent = data.message || "Registration failed!";
+          messageBox.className = "message error";
+        }
+      } catch (error) {
+        messageBox.textContent = "Server error. Please try again later.";
+        messageBox.className = "message error";
+      }
+    });
+  </script>
+
+</body>
+</html>

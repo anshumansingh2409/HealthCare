@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - MedCity</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #e0f7fa, #ffffff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-container {
+      background: white;
+      padding: 2.5rem 3rem;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      width: 100%;
+      animation: fadeIn 0.8s ease-in-out;
+    }
+
+    h2 {
+      text-align: center;
+      color: #00897b;
+      margin-bottom: 1.5rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.9rem;
+      margin-bottom: 1rem;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.9rem;
+      background: #00897b;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #00695c;
+    }
+
+    .message {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+
+    @keyframes fadeIn {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Login to MedCity</h2>
+    <form id="loginForm">
+      <input type="text" name="emailOrPhone" placeholder="Email or Phone" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <div class="message" id="loginMessage"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const messageBox = document.getElementById('loginMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const emailOrPhone = form.emailOrPhone.value.trim();
+      const password = form.password.value.trim();
+
+      if (!emailOrPhone || !password) {
+        messageBox.textContent = "Please enter both fields.";
+        messageBox.className = "message error";
+        return;
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ emailOrPhone, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          messageBox.textContent = data.message || "Login successful!";
+          messageBox.className = "message success";
+
+          localStorage.setItem('token', data.token);
+          
+          // ✅ Redirect to home page (index.html)
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 1000);
+
+        } else {
+          messageBox.textContent = data.error || "Login failed.";
+          messageBox.className = "message error";
+        }
+      } catch (error) {
+        messageBox.textContent = "Server error. Try again later.";
+        messageBox.className = "message error";
+        console.error('Login error:', error);
+      }
+    });
+  </script>
+
+</body>
+</html>

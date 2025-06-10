@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>QR Code Scanner</title>
+  <script src="node_modules/html5-qrcode/html5-qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    main {
+      text-align: center;
+      background: #ffffff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      max-width: 420px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #005d8f;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    #reader {
+      width: 100%;
+      margin: 20px auto;
+    }
+
+    #result {
+      margin-top: 25px;
+      padding: 18px;
+      font-size: 16px;
+      border-radius: 10px;
+      display: none;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+
+    .valid {
+      background: #e6f4ea;
+      border: 1px solid #a3d9b1;
+      color: #256029;
+    }
+
+    .expired {
+      background: #fcebea;
+      border: 1px solid #f5b5b2;
+      color: #8a1c1c;
+    }
+
+    .html5-qrcode-element {
+      width: 300px !important;
+      height: 40px !important;
+      font-size: 15px;
+      background-color: #0077b6;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin: 10px 0;
+    }
+
+    .html5-qrcode-element:hover {
+      background-color: #005f91;
+    }
+
+    strong {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Scan Medicine QR</h1>
+    <div id="reader"></div>
+    <div id="result"></div>
+  </main>
+
+  <script>
+    const scanner = new Html5QrcodeScanner("reader", {
+      qrbox: { width: 250, height: 250 },
+      fps: 20,
+    });
+
+    scanner.render(onScanSuccess, onScanError);
+
+    function onScanSuccess(decodedText) {
+      const resultBox = document.getElementById("result");
+      const expiryMatch = decodedText.match(/EXP:\s*([\d-]+)/i);
+
+      if (expiryMatch) {
+        const expiryDateStr = expiryMatch[1];
+        const expiryDate = new Date(expiryDateStr);
+        const today = new Date();
+        const isValid = expiryDate > today;
+
+        resultBox.className = isValid ? "valid" : "expired";
+        resultBox.innerHTML = `
+          <h2>${isValid ? "✅ Safe to Use" : "❌ Expired"}</h2>
+          <p><strong>Content:</strong> ${decodedText}</p>
+          <p><strong>Expiry Date:</strong> ${expiryDateStr}</p>
+          <p><strong>Status:</strong> ${isValid ? "Medicine is valid for use." : "Do not consume. Medicine is expired."}</p>
+        `;
+      } else {
+        resultBox.className = "valid";
+        resultBox.innerHTML = `
+          <h2>✅ Scan Successful</h2>
+          <p><strong>Content:</strong> ${decodedText}</p>
+          <p><em>⚠️ No expiry date found.</em></p>
+        `;
+      }
+
+      resultBox.style.display = "block";
+      scanner.clear();
+      document.getElementById("reader").remove();
+    }
+
+    function onScanError(errorMessage) {
+      console.warn("Scan error:", errorMessage);
+    }
+  </script>
+</body>
+</html>
+
+
